@@ -1,0 +1,26 @@
+{
+  "name": "discord-minecraft-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JohansenJunias20/discord-minecraft-bot.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JohansenJunias20/discord-minecraft-bot/issues"
+  },
+  "homepage": "https://github.com/JohansenJunias20/discord-minecraft-bot#readme",
+  "dependencies": {
+    "discord.js": "^12.5.3",
+    "dotenv": "^10.0.0",
+    "nodemon": "^2.0.7",
+    "rcon-client": "^4.2.3",
+    "ws": "^7.4.6"
+  }
+}
