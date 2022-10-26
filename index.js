@@ -1,27 +1,25 @@
 require('dotenv').config();
 const Discord = require('discord.js');
-const WS = require("ws");
-var ws = new WS(`ws://192.168.1.70:25575/${process.env.RCON_PASSWORD}/`);
-console.log(`ws://192.168.1.70:25575/${process.env.RCON_PASSWORD}/`)
-ws.onopen = function (event) {
-
-    ws.ping("test", (err) => {
-        console.log(err)
+const { Rcon } = require("rcon-client")
+var rcon;
+async function startRcon() {
+    rcon = await Rcon.connect({
+        host: "192.168.1.70", port: 25575, password: "minecraft"
     })
-    console.log("WebSocket is onopen now.");
-    ws.send(`/say "test"`)
-};
+    console.log("connecteing to rcon")
+    // console.log(await rcon.send("list"))
 
-ws.onmessage = function (event) {
-    console.log("WebSocket is onmessage now.");
-};
-ws.onerror = (e) => {
-    console.log("websocket error")
+    let responses = await Promise.all([
+        // rcon.send("help"),
+        // rcon.send("whitelist list")
+    ])
+
+    for (response of responses) {
+        console.log(response)
+    }
 }
-ws.onclose = function (event) {
-    console.log("WebSocket is onclose now.");
-
-};
+startRcon()
+// rcon.end()
 const client = new Discord.Client();
 client.login(process.env.TOKEN);
 
@@ -29,6 +27,42 @@ client.once('ready', () => {
     console.log("ready!");
 })
 
-client.on("message", (msg) => {
-    console.log(msg);
+client.on("message", async (msg) => {
+    if (msg.author.bot) return;
+    // console.log(msg);
+    var splited = msg.content.split(" ")
+    const command = splited[0];
+    if (splited.length > 1) {
+        splited.shift();
+    }
+    const params = splited;
+    console.log({ command, params })
+    switch (command) {
+        case "!list":
+            var rsp = await rcon.send("list");
+            msg.channel.send(rsp);
+            console.log("sended");
+            break;
+        case "!difficulty":
+            // if(params[)
+            if (!params[0]) {
+                msg.channel.send("please give parameter <peaceful|easy|normal|hard>")
+                return;
+            }
+            console.log({ params })
+            var rsp = await rcon.send(`/difficulty ${params[0]}`);
+            msg.channel.send(rsp);
+            console.log("sended");
+            break;
+        case "!help":
+            const result =
+                `!list = list player online\n!difficulty <peaceful|easy|normal|hard> = set difficulty\n!help = list available commands`
+            msg.channel.send(result);
+            break;
+        default:
+            const defaultresult =
+            `Unknown ${command} command\n!list = list player online\n!difficulty <peaceful|easy|normal|hard> = set difficulty\n!help = list available commands`
+            msg.channel.send(defaultresult);
+            break;
+    }
 })
